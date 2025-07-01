@@ -1,18 +1,18 @@
 import os
-import asyncio
 import threading
+import asyncio
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from telegram import Update
 from telegram.ext import (
     ApplicationBuilder,
-    ContextTypes,
     CommandHandler,
     MessageHandler,
     filters,
+    ContextTypes,
 )
 
-# راه‌اندازی یک سرور ساده HTTP برای اینکه Render پورت 10000 رو تشخیص بده
+# باز کردن یک پورت فیک برای Render
 def run_http_server():
     class SimpleHandler(BaseHTTPRequestHandler):
         def do_GET(self):
@@ -23,11 +23,9 @@ def run_http_server():
     server = HTTPServer(("0.0.0.0", 10000), SimpleHandler)
     server.serve_forever()
 
-# اجرا در یک ترد جداگانه
 threading.Thread(target=run_http_server, daemon=True).start()
 
-# ---------------- ربات ---------------- #
-
+# ربات تلگرام
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -42,7 +40,6 @@ async def main():
     app.add_handler(MessageHandler(filters.TEXT, echo))
     await app.run_polling()
 
-# اجرای ربات به‌صورت async
+# اصلاح شده برای Render:
 if __name__ == "__main__":
     asyncio.get_event_loop().run_until_complete(main())
-
