@@ -1,6 +1,5 @@
 import os
 import threading
-import asyncio
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from telegram import Update
@@ -12,7 +11,7 @@ from telegram.ext import (
     ContextTypes,
 )
 
-# باز کردن یک پورت فیک برای Render
+# اجرای HTTP server برای پورت ساختگی (ترفند Render)
 def run_http_server():
     class SimpleHandler(BaseHTTPRequestHandler):
         def do_GET(self):
@@ -25,7 +24,8 @@ def run_http_server():
 
 threading.Thread(target=run_http_server, daemon=True).start()
 
-# ربات تلگرام
+# ---- ربات تلگرام ----
+
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -34,12 +34,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(update.message.text)
 
-async def main():
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT, echo))
-    await app.run_polling()
+# اجرای مستقیم بدون استفاده از asyncio.run()
+app = ApplicationBuilder().token(BOT_TOKEN).build()
+app.add_handler(CommandHandler("start", start))
+app.add_handler(MessageHandler(filters.TEXT, echo))
 
-# اصلاح شده برای Render:
-if __name__ == "__main__":
-    asyncio.get_event_loop().run_until_complete(main())
+# این نسخه اجرا می‌شه حتی اگر event loop قبلاً اجرا شده باشه
+app.run_polling(close_loop=False)
