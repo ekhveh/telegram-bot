@@ -99,10 +99,10 @@ async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             photo_url = random.choice(ALL_PHOTOS)
             caption = random.choice(CAPTIONS)
             await query.message.reply_photo(photo=photo_url, caption=f"{caption} ({i+1}/3)")
-elif query.data == "get_joke":
-    await query.message.reply_text("دارم دنبال یه جوک خفن می‌گردم... 😁")
-    joke = await get_joke_from_chatgpt()
-    await query.message.reply_text(joke)
+    elif query.data == "get_joke":
+       await query.message.reply_text("دارم دنبال یه جوک خفن می‌گردم... 😁")
+       joke = await get_joke_from_chatgpt()
+       await query.message.reply_text(joke)
 
 # تکرار پیام کاربر (در صورت نیاز)
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
