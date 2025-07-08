@@ -1,9 +1,28 @@
 import os
 import random
 import threading
+import openai
+# کلید API از محیط (در Render ذخیره کن)
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+openai.api_key = OPENAI_API_KEY
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
+
+async def get_joke_from_chatgpt():
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # یا gpt-4 اگه دسترسی داری
+            messages=[
+                {"role": "system", "content": "تو یه کمدین باحال هستی"},
+                {"role": "user", "content": "یه جوک بامزه و خفن درباره رابطه دختر و پدر بگو"}
+            ],
+            max_tokens=100,
+            temperature=0.8
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        return f"خطا در دریافت جوک: {e}"
 
 # اجرای HTTP server برای نگه‌داشتن پورت در Render
 def run_http_server():
@@ -58,7 +77,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("🚀 عکس فضا", callback_data="cat_فضا")],
         [InlineKeyboardButton("🐶 عکس حیوانات", callback_data="cat_حیوانات")],
         [InlineKeyboardButton("🖼 دریافت ۳ عکس تصادفی", callback_data="get_3_images")],
-        [InlineKeyboardButton("📞 تماس با ما", url="https://t.me/YOUR_USERNAME")]
+        [InlineKeyboardButton("📞 تماس با ما", url="https://t.me/YOUR_USERNAME")],
+        [InlineKeyboardButton("🤣 گفتن جوک خفن", callback_data="get_joke")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("سلام! یکی از گزینه‌ها رو انتخاب کن:", reply_markup=reply_markup)
@@ -79,6 +99,10 @@ async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             photo_url = random.choice(ALL_PHOTOS)
             caption = random.choice(CAPTIONS)
             await query.message.reply_photo(photo=photo_url, caption=f"{caption} ({i+1}/3)")
+elif query.data == "get_joke":
+    await query.message.reply_text("دارم دنبال یه جوک خفن می‌گردم... 😁")
+    joke = await get_joke_from_chatgpt()
+    await query.message.reply_text(joke)
 
 # تکرار پیام کاربر (در صورت نیاز)
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
