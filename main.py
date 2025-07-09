@@ -19,7 +19,7 @@ async def get_joke_from_chatgpt():
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "تو یه کمدین باحال هستی"},
-                {"role": "user", "content": "یه جوک بامزه و خفن درباره رابطه دختر و پدر یا کل کل خواهر برادر یا کل کل دختر پسرها بگو"}
+                {"role": "user", "content": "یه جوک بامزه و خفن درباره کل کل فرزندان با پدر و مادر یا کل کل خواهر برادر یا کل کل دختر پسرها بگو"}
             ],
             max_tokens=4000,
             temperature=0.8
