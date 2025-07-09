@@ -21,7 +21,7 @@ async def get_joke_from_chatgpt():
                 {"role": "system", "content": "تو یه کمدین باحال هستی"},
                 {"role": "user", "content": "یه جوک بامزه و خفن درباره رابطه دختر و پدر بگو"}
             ],
-            max_tokens=300,
+            max_tokens=4000,
             temperature=0.8
         )
         return response.choices[0].message.content.strip()
