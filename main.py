@@ -1,18 +1,22 @@
 import os
 import random
 import threading
-import openai
-# کلید API از محیط (در Render ذخیره کن)
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-openai.api_key = OPENAI_API_KEY
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 
+# اصلاح‌شده: ایمپورت جدید OpenAI
+from openai import OpenAI
+
+# کلید API از محیط (در Render ذخیره کن)
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+client = OpenAI(api_key=OPENAI_API_KEY)
+
+# تابع جدید برای گرفتن جوک از GPT
 async def get_joke_from_chatgpt():
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # یا gpt-4 اگه دسترسی داری
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "تو یه کمدین باحال هستی"},
                 {"role": "user", "content": "یه جوک بامزه و خفن درباره رابطه دختر و پدر بگو"}
@@ -99,12 +103,13 @@ async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             photo_url = random.choice(ALL_PHOTOS)
             caption = random.choice(CAPTIONS)
             await query.message.reply_photo(photo=photo_url, caption=f"{caption} ({i+1}/3)")
-    elif query.data == "get_joke":
-       await query.message.reply_text("دارم دنبال یه جوک خفن می‌گردم... 😁")
-       joke = await get_joke_from_chatgpt()
-       await query.message.reply_text(joke)
 
-# تکرار پیام کاربر (در صورت نیاز)
+    elif query.data == "get_joke":
+        await query.message.reply_text("دارم دنبال یه جوک خفن می‌گردم... 😁")
+        joke = await get_joke_from_chatgpt()
+        await query.message.reply_text(joke)
+
+# تکرار پیام کاربر
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(update.message.text)
 
