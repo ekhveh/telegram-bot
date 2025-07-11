@@ -19,7 +19,7 @@ async def get_joke_from_chatgpt():
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "تو یه کمدین باحال هستی"},
-                {"role": "user", "یه جوک بامزه تو زمینه فمینیستی یا جر وبحثهای خانوادگی بگو"}
+                {"role": "user", "content": "یه جوک بامزه تو زمینه فمینیستی یا جر وبحثهای خانوادگی بگو"}
             ],
             max_tokens=4000,
             temperature=0.8
